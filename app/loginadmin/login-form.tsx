@@ -1,13 +1,15 @@
 "use client";
 
 import { type FormEvent, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { getSupabaseClient } from "@/app/lib/supabase/client";
 
 export default function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const accessDenied = searchParams.get("error") === "unauthorized";
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -29,7 +31,10 @@ export default function LoginForm() {
         return;
       }
 
-      router.replace("/dashboard");
+      const nextPath = searchParams.get("next");
+      const destination = nextPath?.startsWith("/dashboard") ? nextPath : "/dashboard";
+
+      router.replace(destination);
       router.refresh();
     } catch {
       setError("Não foi possível iniciar sessão. Verifique a configuração do Supabase.");
@@ -66,7 +71,7 @@ export default function LoginForm() {
         required
         disabled={isSubmitting}
       />
-      {error && <p className="text-sm text-red-300" role="alert">{error}</p>}
+      {(error || accessDenied) && <p className="text-sm text-red-300" role="alert">{error ?? "Esta conta não tem acesso ao painel."}</p>}
       <button
         className="h-12 w-full rounded-lg bg-white text-sm font-semibold text-zinc-900 transition hover:bg-zinc-200 focus:outline-none focus:ring-4 focus:ring-white/20 disabled:cursor-not-allowed disabled:opacity-60"
         type="submit"

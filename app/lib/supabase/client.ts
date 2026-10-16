@@ -1,6 +1,6 @@
-import { createClient } from "@supabase/supabase-js";
+import { createBrowserClient } from "@supabase/ssr";
 
-let supabaseClient: ReturnType<typeof createClient> | undefined;
+let supabaseClient: ReturnType<typeof createBrowserClient> | undefined;
 
 export function getSupabaseClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -10,7 +10,7 @@ export function getSupabaseClient() {
     throw new Error("Configuração do Supabase não encontrada.");
   }
 
-  supabaseClient ??= createClient(url, anonKey);
+  supabaseClient ??= createBrowserClient(url, anonKey);
 
   return supabaseClient;
 }
