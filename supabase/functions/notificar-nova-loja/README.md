@@ -18,7 +18,9 @@ Esta Edge Function envia Web Push para os administradores inscritos quando receb
 
 3. Defina os secrets da Edge Function: `VAPID_SUBJECT` (por exemplo, `mailto:suporte@pedidonoapp.com.br`), `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` e `NEW_STORE_WEBHOOK_SECRET` (valor aleatório forte). `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` já são disponibilizados no runtime da Supabase.
 
-4. Faça deploy da função:
+4. Faça deploy da função. A configuração em `supabase/config.toml` desabilita a
+   validação JWT padrão para este webhook; o handler valida
+   `NEW_STORE_WEBHOOK_SECRET` internamente:
 
    ```bash
    supabase functions deploy notificar-nova-loja

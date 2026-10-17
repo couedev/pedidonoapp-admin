@@ -1,0 +1,4 @@
+[functions.notificar-nova-loja]
+# O chamador é o Database Webhook. A função valida o segredo compartilhado
+# NEW_STORE_WEBHOOK_SECRET no próprio handler.
+verify_jwt = false
