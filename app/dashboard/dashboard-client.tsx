@@ -6,8 +6,9 @@ import { useState, useTransition } from "react";
 import { CalendarDays, ChevronDown, ChevronLeft, ChevronRight, Home, MessageCircle, Settings, Store, TrendingUp, UsersRound, WalletCards } from "lucide-react";
 
 import type { DashboardData, DashboardPeriod, DashboardRange, DashboardStores, StoreOrder } from "@/app/lib/dashboard";
+import PushNotificationButton from "./push-notification-button";
 
-type Section = "inicio" | "lojas" | "configuracoes";
+export type DashboardSection = "inicio" | "lojas" | "configuracoes";
 
 const navigation = [
   { id: "inicio" as const, label: "Início", icon: Home },
@@ -22,10 +23,10 @@ const periods: Array<{ id: Exclude<DashboardPeriod, "custom">; label: string }> 
   { id: "year", label: "Este ano" },
 ];
 
-type Props = { dashboard: DashboardData; range: DashboardRange; error: string | null; stores: DashboardStores; storesError: string | null };
+type Props = { dashboard: DashboardData; range: DashboardRange; error: string | null; stores: DashboardStores; storesError: string | null; initialSection: DashboardSection };
 
-export default function DashboardClient({ dashboard, range, error, stores, storesError }: Props) {
-  const [activeSection, setActiveSection] = useState<Section>("inicio");
+export default function DashboardClient({ dashboard, range, error, stores, storesError, initialSection }: Props) {
+  const [activeSection, setActiveSection] = useState<DashboardSection>(initialSection);
 
   return (
     <main className="min-h-screen bg-[#0a0a0c] p-4 text-zinc-100 sm:p-6">
@@ -88,7 +89,7 @@ function StoreIcon({ src, name }: { src: string | null; name: string }) {
 
 function Overview({ dashboard, range, error }: Pick<Props, "dashboard" | "range" | "error">) {
   return <div className="mx-auto max-w-6xl">
-    <header className="mb-8 flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between"><div><p className="mb-1 text-sm text-zinc-500">Visão geral</p><h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Olá, Administrador</h1><p className="mt-1 text-sm text-zinc-500">Dados realizados em Pix aprovado · {range.label}</p></div><PeriodPicker range={range} /></header>
+    <header className="mb-8 flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between"><div><p className="mb-1 text-sm text-zinc-500">Visão geral</p><h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Olá, Administrador</h1><p className="mt-1 text-sm text-zinc-500">Dados realizados em Pix aprovado · {range.label}</p></div><div className="flex flex-col items-start gap-3 sm:items-end"><PushNotificationButton /><PeriodPicker range={range} /></div></header>
     {error && <div className="mb-4 rounded-2xl border border-amber-300/20 bg-amber-300/10 px-4 py-3 text-sm text-amber-100" role="status">{error} Confirme se a migration administrativa foi aplicada no Supabase.</div>}
     <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"><MetricCard featured icon={WalletCards} label="Receita de taxas" value={formatMoney(dashboard.metrics.receita_taxas)} detail="taxas gravadas nas transações" /><MetricCard icon={UsersRound} label="Lojistas" value={formatCount(dashboard.metrics.lojistas)} detail="donos de lojas cadastrados" /><MetricCard icon={TrendingUp} label="Volume Pix bruto" value={formatMoney(dashboard.metrics.volume_pix_bruto)} detail={`${formatCount(dashboard.metrics.pix_aprovados)} pagamentos aprovados`} /><MetricCard icon={Store} label="Líquido às lojas" value={formatMoney(dashboard.metrics.liquido_lojas)} detail="valor recebido pelos vendedores" /></section>
     <section className="mt-4 grid gap-4 xl:grid-cols-[1.55fr_0.9fr]"><RevenueChart series={dashboard.series} /><article className="rounded-3xl border border-white/[0.08] bg-[#151518] p-5 sm:p-6"><div className="flex items-center justify-between"><p className="text-sm text-zinc-400">Resumo Pix</p><WalletCards size={19} className="text-lime-300" aria-hidden="true" /></div><p className="mt-4 text-4xl font-semibold tracking-tight">{formatCount(dashboard.metrics.pix_aprovados)}</p><p className="mt-1 text-sm text-zinc-500">pagamentos aprovados no período</p><div className="my-7 h-px bg-white/[0.08]" /><div className="space-y-4 text-sm"><SummaryLine label="Volume transacionado" value={formatMoney(dashboard.metrics.volume_pix_bruto)} color="bg-lime-300" /><SummaryLine label="Taxas do Pedidonoapp" value={formatMoney(dashboard.metrics.receita_taxas)} color="bg-emerald-400" /><SummaryLine label="Recebido pelas lojas" value={formatMoney(dashboard.metrics.liquido_lojas)} color="bg-sky-300" /></div></article></section>
