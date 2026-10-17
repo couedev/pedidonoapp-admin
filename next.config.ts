@@ -1,6 +1,15 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "img.pedidonoapp.com.br",
+        pathname: "/app-icons/**",
+      },
+    ],
+  },
   /* config options here */
   experimental: {
     agentFeedback: true,
