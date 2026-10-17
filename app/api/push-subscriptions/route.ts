@@ -35,7 +35,8 @@ export async function POST(request: Request) {
   });
 
   if (error) {
-    return NextResponse.json({ error: "subscription-save-failed" }, { status: 500 });
+    console.error("Falha ao salvar assinatura Web Push", { code: error.code });
+    return NextResponse.json({ error: "subscription-save-failed", code: error.code ?? "unknown" }, { status: 500 });
   }
 
   return NextResponse.json({ ok: true }, { status: 201 });
