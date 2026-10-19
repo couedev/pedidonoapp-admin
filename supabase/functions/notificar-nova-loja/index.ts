@@ -4,7 +4,7 @@ import webpush from "npm:web-push@3.6.7";
 type WebhookPayload = {
   type?: string;
   table?: string;
-  record?: { id?: string; nome_empresa?: string; slug?: string };
+  record?: { id?: string; nome_empresa?: string };
 };
 
 const supabaseUrl = Deno.env.get("SUPABASE_URL");
@@ -28,10 +28,9 @@ Deno.serve(async (request) => {
   if (error) return new Response("Unable to load subscriptions", { status: 500 });
 
   const name = event.record?.nome_empresa || "Nova loja";
-  const slug = event.record?.slug;
   const notification = JSON.stringify({
     title: "Nova loja cadastrada",
-    body: `${name}${slug ? ` · /${slug}` : ""}`,
+    body: name,
     url: "/dashboard?section=lojas&storeOrder=new&storePage=1",
   });
 
