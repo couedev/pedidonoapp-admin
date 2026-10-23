@@ -42,6 +42,7 @@ export type DashboardStores = {
     slug: string;
     whatsapp: string | null;
     icone_app_url: string | null;
+    onboarding_visto: boolean;
     created_at: string;
     pedidos_validos: number;
     volume_vendido: number;
@@ -222,6 +223,7 @@ export async function getDashboardStores(searchParams: Record<string, string | s
         slug: String(store.slug),
         whatsapp: store.whatsapp ? String(store.whatsapp) : null,
         icone_app_url: store.icone_app_url ? String(store.icone_app_url) : null,
+        onboarding_visto: store.onboarding_visto === true,
         created_at: String(store.created_at),
         pedidos_validos: number(store.pedidos_validos),
         volume_vendido: number(store.volume_vendido),
