@@ -216,14 +216,33 @@ export async function getDashboardStores(searchParams: Record<string, string | s
   }
 
   const result = data as Partial<DashboardStores>;
-  const stores = Array.isArray(result.stores)
-    ? result.stores.map((store) => ({
+  const rawStores = Array.isArray(result.stores)
+    ? result.stores
+    : [];
+  const storeIds = rawStores
+    .map((store) => String(store.empresa_id ?? ""))
+    .filter(Boolean);
+  const onboardingByEmpresa = new Map<string, boolean>();
+
+  if (storeIds.length) {
+    const { data: configs } = await supabase
+      .from("empresa_config")
+      .select("empresa_id, onboarding_visto")
+      .in("empresa_id", storeIds);
+
+    for (const config of configs ?? []) {
+      onboardingByEmpresa.set(String(config.empresa_id), config.onboarding_visto === true);
+    }
+  }
+
+  const stores = rawStores.length
+    ? rawStores.map((store) => ({
         empresa_id: String(store.empresa_id),
         nome_empresa: String(store.nome_empresa),
         slug: String(store.slug),
         whatsapp: store.whatsapp ? String(store.whatsapp) : null,
         icone_app_url: store.icone_app_url ? String(store.icone_app_url) : null,
-        onboarding_visto: store.onboarding_visto === true,
+        onboarding_visto: onboardingByEmpresa.get(String(store.empresa_id)) ?? store.onboarding_visto === true,
         created_at: String(store.created_at),
         pedidos_validos: number(store.pedidos_validos),
         volume_vendido: number(store.volume_vendido),
